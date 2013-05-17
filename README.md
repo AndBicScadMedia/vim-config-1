@@ -52,8 +52,8 @@ Files
 
 Functions
 ---------
-- **WC:** running `WC` gives you a wordcount in your statusbar
-- **CB:** running `CB` for "Center Buffer" creates two vertical splits, one to the right and one to the left of your current buffer, and then sets all three equal in width—this is nice in fullscreen in MacVim
+- **WC:** running `:WC` gives you a wordcount in your statusbar
+- **CB:** running `:CB` for "Center Buffer" creates two vertical splits, one to the right and one to the left of your current buffer, and then sets all three equal in width—this is nice in fullscreen in MacVim
 
 Directories
 -----------
