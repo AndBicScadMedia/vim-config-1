@@ -4,6 +4,7 @@ Dan's Vim Configuration
 I'm running [MacVim Snapshot 66](http://code.google.com/p/macvim/) on Mac OS X 10.8.
 
 This repo exists for two reasons.
+
 1. It's a backup for when I inevitably screw something up.
 2. It might help vim enthusiasts of beginners figure out what works for them. I recommend taking a look through the .vimrc file and seeing if some of the options appeal to you. They've generally been cherrypicked from all over the web. 
 
