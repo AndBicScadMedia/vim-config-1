@@ -20,8 +20,8 @@ If you want to try out my vim configuration, you can. Here's my recommended meth
 2. __Clone this repository and move the files into place.__ 
 
         cd ~
-        git clone git://github.com/daturkel/Vim-Config.git
-        cd Vim-Config
+        git clone git://github.com/daturkel/vim-config.git
+        cd vim-config
         mv .vim ..
         mv .vimrc ..
         mv .gvimrc ..
