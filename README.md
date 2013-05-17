@@ -3,6 +3,10 @@ Dan's Vim Configuration
 
 I'm running [MacVim Snapshot 66](http://code.google.com/p/macvim/) on Mac OS X 10.8.
 
+This repo exists for two reasons.
+1. It's a backup for when I inevitably screw something up.
+2. It might help vim enthusiasts of beginners figure out what works for them. I recommend taking a look through the .vimrc file and seeing if some of the options appeal to you. They've generally been cherrypicked from all over the web. 
+
 Read the documentation below before trying out any of my files on your own install.
 
 Try it out
@@ -16,7 +20,8 @@ If you want to try out my vim configuration, you can. Here's my recommended meth
         mv .vimrc vim-backup
         mv .gvimrc vim-backup
         mv .vim vim-backup
- *Seriously! Don't forget to backup your current setup!
+ _*Seriously! Don't forget to backup your current setup!_
+
 2. __Clone this repository and move the files into place.__ 
 
         cd ~
@@ -50,8 +55,8 @@ The following are directories inside the `.vim` directory:
 
 - **autoload:** Pathogen (see below) is placed in here so that it automatically adds bundles on startup
 - **bundle:** Pathogen essentially tricks vim into thinking anything folder in this folder is actually `~/.vim/` so that you can just drag all of a plugin's files a folder here or delete the whole plugin at once.
-- **colors:** color-schemes, some of which I installed, others came with MacVim.
-- **spell:** not really sure, just some stuff that seems to help spellcheck work
+- **colors:** contains the [wombat](http://dengmao.wordpress.com/2007/01/22/vim-color-scheme-wombat/) colorscheme which I use
+- **spell:** this contains the words added to vim's built in dictionary—I recently reset it so right now it hardly contains anything
 
 Plugins Installed
 -----------------
