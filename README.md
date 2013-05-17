@@ -50,6 +50,11 @@ Files
 - **.vimrc:** this is vim's runtime configuration file and contains the settings that make my vim special; this is commented to help you understand what lines are doing
 - **.gvimrc:** these are just a few settings that pertain particularly to vim running in a graphic user interface (aka gvim); this too has comments to help explain it  
 
+Functions
+---------
+- **WC:** running `WC` gives you a wordcount in your statusbar
+- **CB:** running `CB` for "Center Buffer" creates two vertical splits, one to the right and one to the left of your current buffer, and then sets all three equal in width—this is nice in fullscreen in MacVim
+
 Directories
 -----------
 The following are directories inside the `.vim` directory:
@@ -61,12 +66,11 @@ The following are directories inside the `.vim` directory:
 
 Plugins Installed
 -----------------
-- **[ctrlp:](http://kien.github.com/ctrlp.vim/)** easy full-path fuzzy file finder
-- **[Pathogen:](http://www.vim.org/scripts/script.php?script_id=2332)** manage vim plugins easily
-- **[SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643)** insert-mode tab-key autocompletion
-- **[Vim-Latex:](http://vim-latex.sourceforge.net/)** tools for LaTeX editing in vim
-- **[vim-markdown:](https://github.com/tpope/vim-markdown)** adds markdown syntax detection for vim
-- **[vim-startify:](https://github.com/mhinz/vim-startify)** gives me a nice startup page for vim
-- **[xmledit:](https://github.com/sukima/xmledit/)** does tag autocompletion for xml and html
-
+- ** [ctrlp:](http://kien.github.com/ctrlp.vim/) ** easy full-path fuzzy file finder
+- ** [Pathogen:](http://www.vim.org/scripts/script.php?script_id=2332) ** manage vim plugins easily
+- ** [SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643) ** insert-mode tab-key autocompletion
+- ** [Vim-Latex:](http://vim-latex.sourceforge.net/) ** tools for LaTeX editing in vim
+- ** [vim-markdown:](https://github.com/tpope/vim-markdown) ** adds markdown syntax detection for vim
+- ** [vim-startify:](https://github.com/mhinz/vim-startify) ** gives me a nice startup page for vim
+- ** [xmledit:](https://github.com/sukima/xmledit/) ** does tag autocompletion for xml and html
 

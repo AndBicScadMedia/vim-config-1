@@ -14,5 +14,3 @@ set columns=100
 set showtabline=2
 " window transparency is 1%
 set transparency=1
-" disable max-horizontal width in fullscreen
-set fuoptions-=maxhorz

@@ -19,7 +19,20 @@ function! WC()
 endfunction
 
 command WC call WC()
-"" End word count
+"" end Word Count
+
+"" Center Buffer
+function! CenterBuf()
+    vnew
+    wincmd l
+    rightbelow vnew
+    wincmd h
+    wincmd =
+endfunction
+
+command CB call CenterBuf()
+
+"" End Center Buffer
 
 """ PLUGIN SETTINGS
 
@@ -180,7 +193,7 @@ set softtabstop=4
 " horizontal splits come below
 set splitbelow
 " vertical splits on the right
-set splitright
+"set splitright
 " see differences between current file and file it was loaded from
 if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
@@ -237,4 +250,3 @@ else
 endif " has("autocmd")
 
 """ END GENERAL SETTINGS
-
