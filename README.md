@@ -1,7 +1,7 @@
 Dan's Vim Configuration
 =======================
 
-I'm running [MacVim Snapshot 64](http://code.google.com/p/macvim/) on Mac OS X 10.8.
+I'm running [MacVim Snapshot 66](http://code.google.com/p/macvim/) on Mac OS X 10.8.
 
 Read the documentation below before trying out any of my files on your own install.
 
@@ -56,15 +56,11 @@ The following are directories inside the `.vim` directory:
 Plugins Installed
 -----------------
 - **[ctrlp:](http://kien.github.com/ctrlp.vim/)** easy full-path fuzzy file finder
-- **[NERDTree:](http://www.vim.org/scripts/script.php?script_id=1658)** filetree browser
 - **[Pathogen:](http://www.vim.org/scripts/script.php?script_id=2332)** manage vim plugins easily
-- **[ShowMarks:](http://www.vim.org/scripts/script.php?script_id=152)** toggle column of mark locations and names
-- **[Snipmate-Snippets:](https://github.com/honza/snipmate-snippets)** pre-written code snippets for tons of languages for use with Vim-Snipmate
 - **[SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643)** insert-mode tab-key autocompletion
-- **[tlib:](https://github.com/tomtom/tlib_vim)** a dependency for vim-snipmate; its ability to create a filterable list of selections is used
-- **[Vim-Addon-MW-Utils:](https://github.com/MarcWeber/vim-addon-mw-utils)** a dependency of Vim-Snipmate for "caching parched .snippets files" according to the Vim-Snipmate documentation
 - **[Vim-Latex:](http://vim-latex.sourceforge.net/)** tools for LaTeX editing in vim
-- **[Vim-Snipmate:](https://github.com/garbas/vim-snipmate/)** a fork of the original [Snipmate](https://github.com/msanders/snipmate.vim) but unlike the original, it is in active development; it allows for easy code snippets
-- **[VimOutLiner:](http://www.vim.org/scripts/script.php?script_id=3515)** outlines and to-do lists
+- **[vim-markdown:](https://github.com/tpope/vim-markdown)** adds markdown syntax detection for vim
+- **[vim-startify:(https://github.com/mhinz/vim-startify)** gives me a nice startup page for vim
+- **[xmledit:](https://github.com/sukima/xmledit/)** does tag autocompletion for xml and html
 
-More info to come.
+
