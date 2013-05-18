@@ -69,8 +69,8 @@ Plugins Installed
 - **[ctrlp:](http://kien.github.com/ctrlp.vim/)** easy full-path fuzzy file finder
 - **[Pathogen:](http://www.vim.org/scripts/script.php?script_id=2332)** manage vim plugins easily
 - **[SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643)** insert-mode tab-key autocompletion
+- **[Ultisnips:](https://github.com/SirVer/ultisnips)** replacing previous tools for speeding up html writing, ultisnips is a snippet manager
 - **[Vim-Latex:](http://vim-latex.sourceforge.net/)** tools for LaTeX editing in vim
 - **[vim-markdown:](https://github.com/tpope/vim-markdown)** adds markdown syntax detection for vim
 - **[vim-startify:](https://github.com/mhinz/vim-startify)** gives me a nice startup page for vim
-- **[xmledit:](https://github.com/sukima/xmledit/)** does tag autocompletion for xml and html
 
