@@ -65,12 +65,6 @@ let g:Tex_DefaultTargetFormat='pdf'
 let g:Tex_ViewRule_ps = 'Preview'
 let g:Tex_ViewRule_pdf = 'Skim'
 
-"" showmarks settings
-" only show my marks a-z and A-Z
-let showmarks_include="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-" off by default
-let showmarks_enable=0
-
 "" supertab settings
 " utilize vim's omnicomplete (disabled for now)
 let g:SuperTabDefaultCompletionType = "context"
