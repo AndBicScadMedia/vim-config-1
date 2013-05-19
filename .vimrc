@@ -42,6 +42,10 @@ call pathogen#infect()
 " auto import helptags
 call pathogen#helptags()
 
+"" zencoding settings
+" remap zen-leader-key
+let g:user_zen_leader_key = '<c-e>'
+
 "" ctrlp settings
 " multi-session caching
 let g:ctrlp_use_caching = 1
@@ -156,6 +160,8 @@ else
   set backupdir=~/.vim/backup
   set directory=~/.vim/tmp
 endif
+" turn on spellcheck by default
+set spell
 " keep 700 lines of history
 set history=700	
 " show the cursor position all the time
