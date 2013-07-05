@@ -43,6 +43,23 @@ command CB call CenterBuf()
 
 """ PLUGIN SETTINGS
 
+"" airline settings
+" remove seperators
+let g:airline_left_sep=''
+let g:airline_right_sep=''
+" remove unused modes
+let g:airline_enable_fugitive=0
+let g:airline_enable_syntastic=0
+" further customization
+" set second section to path
+let g:airline_section_b="%f"
+" empty third and fourth sections
+let g:airline_section_c=""
+let g:airline_section_x=""
+" put filetype in fifth section
+let g:airline_section_y="%Y"
+
+
 "" pathogen settings
 " add bundle folders to runtime path
 call pathogen#infect()
@@ -88,21 +105,21 @@ let g:SuperTabDefaultCompletionType = "context"
 " always show statusline
 set laststatus=2
 " blank statusline
-set statusline=\  
+"set statusline=\  
 " append filename
-set statusline+=%t
+"set statusline+=%t
 " append filetype
-set statusline+=\ %y
+"set statusline+=\ %y
 " append flags (read-only/modified)
-set statusline+=\ %r%m
+"set statusline+=\ %r%m
 " right align
-set statusline+=\ %=
+"set statusline+=\ %=
 " append [current-line/num-lines,current-column]
-set statusline+=[%l/%L,%c]
+"set statusline+=[%l/%L,%c]
 " append percentage
-set statusline+=\ %P
+"set statusline+=\ %P
 " append trailing space
-set statusline+=\ 
+"set statusline+=\ 
 
 "" fold settings
 " on close, save view, and on open, reopen it--this saves folds
