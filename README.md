@@ -1,7 +1,7 @@
 Dan's Vim Configuration
 =======================
 
-I'm running [MacVim Snapshot 66](http://code.google.com/p/macvim/) on Mac OS X 10.8.
+I'm running [MacVim Snapshot 67](http://code.google.com/p/macvim/) on Mac OS X 10.9.
 
 This repo exists for two reasons.
 
@@ -69,6 +69,7 @@ Plugins Installed
 - **[ctrlp:](http://kien.github.com/ctrlp.vim/)** easy full-path fuzzy file finder
 - **[Pathogen:](http://www.vim.org/scripts/script.php?script_id=2332)** manage vim plugins easily
 - **[SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643)** insert-mode tab-key autocompletion
+- **[Vim-Airline:](https://github.com/bling/vim-airline)** a light-weight statusline replacement
 - **[Vim-Latex:](http://vim-latex.sourceforge.net/)** tools for LaTeX editing in vim
 - **[vim-markdown:](https://github.com/tpope/vim-markdown)** adds markdown syntax detection for vim
 - **[vim-startify:](https://github.com/mhinz/vim-startify)** gives me a nice startup page for vim
