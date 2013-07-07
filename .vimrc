@@ -51,7 +51,7 @@ let g:airline_right_sep=''
 let g:airline_enable_fugitive=0
 let g:airline_enable_syntastic=0
 " further customization
-" set second section to path
+" set second section to filename
 let g:airline_section_b="%f"
 " empty third and fourth sections
 let g:airline_section_c=""
