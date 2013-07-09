@@ -147,7 +147,12 @@ set number
 set cursorline
 " set colorscheme
 syntax enable
-colorscheme wombat 
+if has("gui_running")
+    colorscheme wombat 
+else
+    colorscheme wombat256mod
+endif
+
 " set font
 if has('gui_running')
 	set guifont=Inconsolata:h12
