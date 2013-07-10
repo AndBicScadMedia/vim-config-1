@@ -5,8 +5,26 @@
 
 " no compatibility mode
 set nocompatible
+filetype off
 
 """ END MUST-BE-FIRST THINGS
+
+"" BUNDLE MANAGEMENT
+
+" vundle setup
+set rtp+=~/.vim/bundle/vundle
+call vundle#rc()
+Bundle 'gmarik/vundle'
+
+" My Bundles:
+" ctrlp
+Bundle 'kien/ctrlp.vim'
+Bundle 'ervandew/supertab'
+Bundle 'bling/vim-airline'
+Bundle 'git://git.code.sf.net/p/vim-latex/vim-latex'
+Bundle 'tpope/vim-markdown'
+Bundle 'mhinz/vim-startify'
+Bundle 'mattn/zencoding-vim'
 
 """ FUNCTION DEFINITIONS
 
@@ -58,13 +76,6 @@ let g:airline_section_c=""
 let g:airline_section_x=""
 " put filetype in fifth section
 let g:airline_section_y="%Y"
-
-
-"" pathogen settings
-" add bundle folders to runtime path
-call pathogen#infect()
-" auto import helptags
-call pathogen#helptags()
 
 "" zencoding settings
 " remap zen-leader-key

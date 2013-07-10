@@ -1,7 +1,7 @@
 " Plugin:      https://github.com/mhinz/vim-startify
 " Description: Start screen displaying recently used stuff.
 " Maintainer:  Marco Hinz <http://github.com/mhinz>
-" Version:     1.5
+" Version:     1.6
 
 if exists('g:autoloaded_startify') || &cp
   finish
@@ -43,16 +43,16 @@ function! startify#insane_in_the_membrane() abort
     for fname in v:oldfiles
       let expfname = resolve(fnamemodify(fname, ':p'))
       " filter duplicates, bookmarks and entries from the skiplist
-      if has_key(entries, expfname) ||
-            \ !filereadable(expfname) ||
-            \ (exists('g:startify_skiplist')  && s:is_in_skiplist(expfname)) ||
-            \ (exists('g:startify_bookmarks') && s:is_bookmark(expfname))
+      if has_key(entries, expfname)
+            \ || !filereadable(expfname)
+            \ || (exists('g:startify_skiplist')  && s:is_in_skiplist(expfname))
+            \ || (exists('g:startify_bookmarks') && s:is_bookmark(expfname))
         continue
       endif
       let entries[expfname] = 1
       let index = s:get_index_as_string(cnt)
       call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
-      execute 'nnoremap <buffer> '. index .' :edit '. s:escape(fname) .' <bar> lcd %:h<cr>'
+      execute 'nnoremap <buffer> '. index .' :edit '. fnameescape(fname) .' <bar> lcd %:h<cr>'
       let cnt += 1
       if (cnt == numfiles)
         break
@@ -68,7 +68,7 @@ function! startify#insane_in_the_membrane() abort
       let idx = (i + cnt)
       let index = s:get_index_as_string(idx)
       call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fnamemodify(sfiles[i], ':t:r'))
-      execute 'nnoremap <buffer> '. index .' :bd <bar> tabnew +source\ '. s:escape(sfiles[i]) .' <bar> if (line2byte("$") == -1) <bar> close <bar> endif<cr>'
+      execute 'nnoremap <buffer> '. index .' :source '. fnameescape(sfiles[i]) .'<cr>'
     endfor
     let cnt = idx
   endif
@@ -79,7 +79,7 @@ function! startify#insane_in_the_membrane() abort
       let cnt += 1
       let index = s:get_index_as_string(cnt)
       call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
-      execute 'nnoremap <buffer> '. index .' :edit '. s:escape(fname) .' <bar> lcd %:h<cr>'
+      execute 'nnoremap <buffer> '. index .' :edit '. fnameescape(fname) .' <bar> lcd %:h<cr>'
     endfor
   endif
 
@@ -89,12 +89,12 @@ function! startify#insane_in_the_membrane() abort
 
   setlocal nomodifiable nomodified
 
-  nnoremap <buffer><silent> e       :enew<cr>
-  nnoremap <buffer><silent> i       :enew <bar> startinsert<cr>
-  nnoremap <buffer><silent> <space> :call <SID>set_mark('B')<cr>
-  nnoremap <buffer><silent> s       :call <SID>set_mark('S')<cr>
-  nnoremap <buffer><silent> v       :call <SID>set_mark('V')<cr>
-  nnoremap <buffer>         <cr>    :call <SID>open_buffers(expand('<cword>'))<cr>
+  nnoremap <buffer><silent> e             :enew<cr>
+  nnoremap <buffer><silent> i             :enew <bar> startinsert<cr>
+  nnoremap <buffer><silent> b             :call <SID>set_mark('B')<cr>
+  nnoremap <buffer><silent> s             :call <SID>set_mark('S')<cr>
+  nnoremap <buffer><silent> v             :call <SID>set_mark('V')<cr>
+  nnoremap <buffer>         <cr>          :call <SID>open_buffers(expand('<cword>'))<cr>
   nnoremap <buffer>         <2-LeftMouse> :execute 'normal '. matchstr(getline('.'), '\w\+')<cr>
   nnoremap <buffer>         q
         \ :if (len(filter(range(0, bufnr('$')), 'buflisted(v:val)')) > 1) <bar>
@@ -110,8 +110,103 @@ function! startify#insane_in_the_membrane() abort
   autocmd! startify *
   autocmd  startify CursorMoved <buffer> call s:set_cursor()
   autocmd  startify BufLeave    <buffer> autocmd! startify *
+  autocmd  startify WinLeave    <buffer> bd
 
   call cursor(special ? 4 : 2, 5)
+endfunction
+
+" Function: startify#session_delete {{{1
+function! startify#session_delete(...) abort
+  if !isdirectory(s:session_dir)
+    echo 'The session directory does not exist: '. s:session_dir
+    return
+  elseif empty(startify#session_list_as_string(''))
+    echo 'There are no sessions...'
+    return
+  endif
+  let spath = s:session_dir . startify#get_separator() . (exists('a:1')
+        \ ? a:1
+        \ : input('Delete this session: ', fnamemodify(v:this_session, ':t'), 'custom,startify#session_list_as_string'))
+        \ | redraw
+  echo 'Really delete '. spath .'? [y/n]' | redraw
+  if (nr2char(getchar()) == 'y')
+    if delete(spath) == 0
+      echo 'Deleted session '. spath .'!'
+    else
+      echo 'Deletion failed!'
+    endif
+  else
+    echo 'Deletion aborted!'
+  endif
+endfunction
+
+" Function: startify#session_save {{{1
+function! startify#session_save(...) abort
+  if !isdirectory(s:session_dir)
+    if exists('*mkdir')
+      echo 'The session directory does not exist: '. s:session_dir .'. Create it?  [y/n]' | redraw
+      if (nr2char(getchar()) == 'y')
+        call mkdir(s:session_dir, 'p')
+      else
+        echo
+        return
+      endif
+    else
+      echo 'The session directory does not exist: '. s:session_dir
+      return
+    endif
+  endif
+  if exists('a:1')
+    let sname = a:1
+  else
+    let sname = input('Save under this session name: ', fnamemodify(v:this_session, ':t'), 'custom,startify#session_list_as_string')
+    redraw
+    if empty(sname)
+      echo 'You gave an empty name!'
+      return
+    endif
+  endif
+  let spath = s:session_dir . startify#get_separator() . sname
+  if !filereadable(spath)
+    execute 'mksession '. fnameescape(spath) | echo 'Session saved under: '. spath
+    return
+  endif
+  echo 'Session already exists. Overwrite?  [y/n]' | redraw
+  if nr2char(getchar()) == 'y'
+    execute 'mksession! '. fnameescape(spath) | echo 'Session saved under: '. spath
+  else
+    echo 'Did NOT save the session!'
+  endif
+endfunction
+
+" Function: startify#session_load {{{1
+function! startify#session_load(...) abort
+  if !isdirectory(s:session_dir)
+    echo 'The session directory does not exist: '. s:session_dir
+    return
+  elseif empty(startify#session_list_as_string(''))
+    echo 'There are no sessions...'
+    return
+  endif
+  let spath = s:session_dir . startify#get_separator() . (exists('a:1')
+        \ ? a:1
+        \ : input('Load this session: ', fnamemodify(v:this_session, ':t'), 'custom,startify#session_list_as_string'))
+        \ | redraw
+  if filereadable(spath)
+    execute 'source '. fnameescape(spath)
+  else
+    echo 'No such file: '. spath
+  endif
+endfunction
+
+" Function: startify#session_list {{{1
+function! startify#session_list(lead, ...) abort
+  return map(split(globpath(s:session_dir, '*'.a:lead.'*'), '\n'), 'fnamemodify(v:val, ":t")')
+endfunction
+
+" Function: startify#session_list_as_string {{{1
+function! startify#session_list_as_string(lead, ...) abort
+  return join(map(split(globpath(s:session_dir, '*'.a:lead.'*'), '\n'), 'fnamemodify(v:val, ":t")'), "\n")
 endfunction
 
 " Function: startify#get_separator {{{1
@@ -119,20 +214,6 @@ function! startify#get_separator() abort
   return !exists('+shellslash') || &shellslash ? '/' : '\'
 endfunction
 
-" Function: s:get_session_names {{{1
-function! s:get_session_names(lead, ...) abort
-  return map(split(globpath(s:session_dir, '*'.a:lead.'*', '\n')), 'fnamemodify(v:val, ":t")')
-endfunction
-
-" Function: s:get_session_names_as_string {{{1
-function! s:get_session_names_as_string(lead, ...) abort
-  return join(map(split(globpath(s:session_dir, '*'.a:lead.'*', '\n')), 'fnamemodify(v:val, ":t")'), "\n")
-endfunction
-
-" Function: s:escape {{{1
-function! s:escape(path) abort
-  return !exists('+shellslash') || &shellslash ? fnameescape(a:path) : escape(a:path, '\')
-endfunction
 
 " Function: s:is_in_skiplist {{{1
 function! s:is_in_skiplist(arg) abort
@@ -151,84 +232,6 @@ function! s:is_bookmark(arg) abort
       return 1
     endif
   endfor
-endfunction
-
-" Function: s:delete_session {{{1
-function! s:delete_session(...) abort
-  if !isdirectory(s:session_dir)
-    echo 'The session directory does not exist: '. s:session_dir
-    return
-  elseif empty(s:get_session_names_as_string(''))
-    echo 'There are no sessions...'
-    return
-  endif
-  let spath = s:session_dir . startify#get_separator() . (exists('a:1')
-        \ ? a:1
-        \ : input('Delete this session: ', fnamemodify(v:this_session, ':t'), 'custom,s:get_session_names_as_string'))
-        \ | redraw
-  echo 'Really delete '. spath .'? [y/n]' | redraw
-  if (nr2char(getchar()) == 'y')
-    if delete(spath) == 0
-      echo 'Deleted session '. spath .'!'
-    else
-      echo 'Deletion failed!'
-    endif
-  else
-    echo 'Deletion aborted!'
-  endif
-endfunction
-
-" Function: s:save_session {{{1
-function! s:save_session(...) abort
-  if !isdirectory(s:session_dir)
-    if exists('*mkdir')
-      echo 'The session directory does not exist: '. s:session_dir .'. Create it?  [y/n]' | redraw
-      if (nr2char(getchar()) == 'y')
-        call mkdir(s:session_dir, 'p')
-      else
-        echo
-        return
-      endif
-    else
-      echo 'The session directory does not exist: '. s:session_dir
-      return
-    endif
-  endif
-  let spath = s:session_dir . startify#get_separator() . (exists('a:1')
-        \ ? a:1
-        \ : input('Save under this session name: ', fnamemodify(v:this_session, ':t'), 'custom,s:get_session_names_as_string'))
-        \ | redraw
-  let spath = s:escape(spath)
-  if !filereadable(spath)
-    execute 'mksession '. spath | echo 'Session saved under: '. spath
-    return
-  endif
-  echo 'Session already exists. Overwrite?  [y/n]' | redraw
-  if nr2char(getchar()) == 'y'
-    execute 'mksession! '. spath | echo 'Session saved under: '. spath
-  else
-    echo 'Did NOT save the session!'
-  endif
-endfunction
-
-" Function: s:load_session {{{1
-function! s:load_session(...) abort
-  if !isdirectory(s:session_dir)
-    echo 'The session directory does not exist: '. s:session_dir
-    return
-  elseif empty(s:get_session_names_as_string(''))
-    echo 'There are no sessions...'
-    return
-  endif
-  let spath = s:session_dir . startify#get_separator() . (exists('a:1')
-        \ ? a:1
-        \ : input('Load this session: ', fnamemodify(v:this_session, ':t'), 'custom,s:get_session_names_as_string'))
-        \ | redraw
-  if filereadable(spath)
-    execute 'source '. s:escape(spath)
-  else
-    echo 'No such file: '. spath
-  endif
 endfunction
 
 " Function: s:open_buffers {{{1
@@ -250,6 +253,16 @@ function! s:open_buffers(cword) abort
     endfor
   else
     execute 'normal '. a:cword
+  endif
+endfunction
+
+" Function: s:get_index_as_string {{{1
+function! s:get_index_as_string(idx) abort
+  if exists('g:startify_custom_indices')
+    let listlen = len(g:startify_custom_indices)
+    return (a:idx < listlen) ? g:startify_custom_indices[a:idx] : string(a:idx - listlen)
+  else
+    return string(a:idx)
   endif
 endfunction
 
@@ -282,16 +295,6 @@ function! s:set_mark(type) abort
     execute 'normal! ci]'. repeat(a:type, len(matches[1]))
   endif
   setlocal nomodifiable nomodified
-endfunction
-
-" Function: s:get_index_as_string {{{1
-function! s:get_index_as_string(idx) abort
-  if exists('g:startify_custom_indices')
-    let listlen = len(g:startify_custom_indices)
-    return (a:idx < listlen) ? g:startify_custom_indices[a:idx] : string(a:idx - listlen)
-  else
-    return string(a:idx)
-  endif
 endfunction
 
 " Function: s:set_cursor {{{1

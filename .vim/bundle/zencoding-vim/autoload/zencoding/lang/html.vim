@@ -118,6 +118,24 @@ function! zencoding#lang#html#parseIntoTree(abbr, type)
       let current.name = ''
     endif
 
+    let custom_expands = zencoding#getResource(type, 'custom_expands', {})
+    if empty(custom_expands) && has_key(settings, 'custom_expands')
+      let custom_expands = settings['custom_expands']
+    endif
+    for k in keys(custom_expands)
+      if tag_name =~ k
+        if parent.name == ''
+          let div = zencoding#lang#html#parseTag('<div/>')
+          let div.value = '{\${' . tag_name . '}}'
+          let current.snippet = zencoding#toString(div, type, 0, [])
+        else
+          let current.snippet = '${' . tag_name . '}'
+        endif
+        let current.name = ''
+        break
+      endif
+    endfor
+
     " default_attributes
     let default_attributes = zencoding#getResource(type, 'default_attributes', {})
     if !empty(default_attributes)
@@ -597,9 +615,10 @@ function! zencoding#lang#html#balanceTag(flag) range
       endif
     endwhile
   endif
-  call setpos('.', curpos)
   if a:flag == -2 || a:flag == 2
     silent! exe "normal! gv"
+  else
+    call setpos('.', curpos)
   endif
 endfunction
 

@@ -146,9 +146,9 @@ endfunction
 "==============================================================================
 function! zencoding#util#getContentFromURL(url)
   let res = system(printf("%s %s", g:zencoding_curl_command, shellescape(substitute(a:url, '#.*', '', ''))))
-  let charset = matchstr(res, '<meta[^>]\+content=["''][^;"'']\+;\s\+charset=\zs[^;"'']\+\ze["'']>')
+  let charset = matchstr(res, '<meta[^>]\+content=["''][^;"'']\+;\s*charset=\zs[^;"'']\+\ze["''][^>]*>')
   if len(charset) == 0
-    let charset = matchstr(res, '<meta\s\+charset=["'']\?\zs[^"'']\+\ze["'']\?[^>]\+>')
+    let charset = matchstr(res, '<meta\s\+charset=["'']\?\zs[^"'']\+\ze["'']\?[^>]*>')
   endif
   if len(charset) == 0
     let s1 = len(split(res, '?'))
@@ -265,4 +265,30 @@ function! zencoding#util#unique(arr)
     endif
   endfor
   return r
+endfunction
+
+let s:seed = localtime()
+function! zencoding#util#srand(seed)
+  let s:seed = a:seed
+endfunction
+
+function! zencoding#util#rand()
+  let s:seed = s:seed * 214013 + 2531011
+  return (s:seed < 0 ? s:seed - 0x80000000 : s:seed) / 0x10000 % 0x8000
+endfunction
+
+function! zencoding#util#cache(name, ...)
+  let content = get(a:000, 0, "")
+  let dir = expand("~/.zencoding/cache")
+  if !isdirectory(dir)
+    call mkdir(dir, "p", 0700)
+  endif
+  let file = dir . "/" . substitute(a:name, '\W', '_', 'g')
+  if len(content) == 0
+    if !filereadable(file)
+      return ""
+    endif
+	return join(readfile(file), "\n")
+  endif
+  call writefile(split(content, "\n"), file)
 endfunction
