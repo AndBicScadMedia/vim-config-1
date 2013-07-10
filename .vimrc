@@ -133,10 +133,6 @@ set laststatus=2
 "set statusline+=\ 
 
 "" fold settings
-" on close, save view, and on open, reopen it--this saves folds
-au BufWinLeave * silent! mkview
-au BufWinEnter * silent! loadview
-" fold settings
 set foldmethod=syntax
 set foldnestmax=10
 set nofoldenable
