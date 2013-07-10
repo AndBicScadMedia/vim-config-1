@@ -59,18 +59,18 @@ Directories
 -----------
 The following are directories inside the `.vim` directory:
 
-- **autoload:** Pathogen (see below) is placed in here so that it automatically adds bundles on startup
-- **bundle:** Pathogen essentially tricks vim into thinking anything folder in this folder is actually `~/.vim/` so that you can just drag all of a plugin's files a folder here or delete the whole plugin at once.
+- **after:** I have a file in here which stops Vim from spellchecking my Startify screen.
+- **bundle:** Vundle uses this to store my plugins
 - **colors:** contains the [wombat](http://dengmao.wordpress.com/2007/01/22/vim-color-scheme-wombat/) colorscheme which I use
 - **spell:** this contains the words added to vim's built in dictionary—I recently reset it so right now it hardly contains anything
 
 Plugins Installed
 -----------------
 - **[ctrlp:](http://kien.github.com/ctrlp.vim/)** easy full-path fuzzy file finder
-- **[Pathogen:](http://www.vim.org/scripts/script.php?script_id=2332)** manage vim plugins easily
 - **[SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643)** insert-mode tab-key autocompletion
 - **[Vim-Airline:](https://github.com/bling/vim-airline)** a light-weight statusline replacement
 - **[Vim-Latex:](http://vim-latex.sourceforge.net/)** tools for LaTeX editing in vim
 - **[vim-markdown:](https://github.com/tpope/vim-markdown)** adds markdown syntax detection for vim
 - **[vim-startify:](https://github.com/mhinz/vim-startify)** gives me a nice startup page for vim
+- **[Vundle:](https://github.com/gmarik/vundle)** lets me easily manage my plugins and also automatically update them using Git :)
 - **[ZenCoding-vim:](https://github.com/mattn/zencoding-vim)** replacing xmledit *and* ultisnips *and* sparkup for quick html writing—finally decided that this is the plugin I want
