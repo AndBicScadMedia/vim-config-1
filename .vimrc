@@ -1,13 +1,13 @@
-"""" Dan Turkel
-"""" .VIMRC
+""" Dan Turkel
+""" .VIMRC
 
-""" MUST-BE-FIRST THINGS
+"" MUST-BE-FIRST THINGS
 
 " no compatibility mode
 set nocompatible
 filetype off
 
-""" END MUST-BE-FIRST THINGS
+"" END MUST-BE-FIRST THINGS
 
 "" BUNDLE MANAGEMENT
 
@@ -17,7 +17,6 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 
 " My Bundles:
-" ctrlp
 Bundle 'kien/ctrlp.vim'
 Bundle 'ervandew/supertab'
 Bundle 'bling/vim-airline'
@@ -26,16 +25,18 @@ Bundle 'tpope/vim-markdown'
 Bundle 'mhinz/vim-startify'
 Bundle 'mattn/zencoding-vim'
 
-""" FUNCTION DEFINITIONS
+"" END BUNDLE MANAGEMENT
 
-"" Markdown Preview
+"" FUNCTION DEFINITIONS
+
+" Markdown Preview
 function! s:setupMarkup()
   nnoremap <leader>p :silent !open -a Marked.app '%:p'<cr>
 endfunction
 
 au BufRead,BufNewFile *.{md,markdown,mdown,mkd,mkdn} call s:setupMarkup()
 
-"" Word Count
+" Word Count
 function! WC()
     let filename = expand("%")
     let cmd = "detex " . filename . " | wc -w | tr -d [:space:]"
@@ -44,9 +45,8 @@ function! WC()
 endfunction
 
 command WC call WC()
-"" end Word Count
 
-"" Center Buffer
+" Center Buffer
 function! CenterBuf()
     vnew
     wincmd l
@@ -57,9 +57,12 @@ endfunction
 
 command CB call CenterBuf()
 
-"" End Center Buffer
+"" END FUNCTION DEFINITIONS
 
-""" PLUGIN SETTINGS
+"" PLUGIN SETTINGS
+
+" ensures that indentation plugins load based on filetype 
+filetype plugin indent on
 
 "" airline settings
 " remove seperators
@@ -94,8 +97,6 @@ let g:Imap_UsePlaceHolders = 0
 let g:Tex_CompileRule_pdf = 'xelatex --interaction=nonstopmode $*'
 " grep always generates a file-name to fix compatibility bug with vim-latex
 set grepprg=grep\ -nH\ $*
-" ensures that indentation plugins load based on filetype 
-filetype plugin indent on
 " tex assumed to be latex
 let g:tex_flavor='latex'
 " always compile to pdf
@@ -108,14 +109,14 @@ let g:Tex_ViewRule_pdf = 'Skim'
 " utilize vim's omnicomplete (disabled for now)
 let g:SuperTabDefaultCompletionType = "context"
 
-""" END PLUGIN SETTINGS
+"" END PLUGIN SETTINGS
 
 """ GENERAL SETTINGS
 
 "" statusline settings
 " always show statusline
 set laststatus=2
-" blank statusline
+" blank statusline (old statusline, now replaced with airline)
 "set statusline=\  
 " append filename
 "set statusline+=%t
@@ -132,7 +133,7 @@ set laststatus=2
 " append trailing space
 "set statusline+=\ 
 
-"" fold settings
+" fold settings
 set foldmethod=syntax
 set foldnestmax=10
 set nofoldenable
@@ -145,11 +146,9 @@ set so=5
 nnoremap j gj
 nnoremap k gk
 
-"" appearence settings
-" line numbers for current buffer only
+"" appearance settings
+" line numbers
 set number
-:au WinEnter * :setlocal number
-:au WinLeave * :setlocal nonumber
 " highlight current line
 set cursorline
 " set colorscheme
@@ -174,8 +173,6 @@ endif
 "" behavioral settings
 " determine that the .vimrc file is a .vim file
 au BufRead,BufNewFile *.vimrc set filetype=vim
-" use manual folds for .vim files
-au FileType vim setlocal foldmethod=manual
 " auto read outside changes
 set autoread
 " return to last edit position when opening files
@@ -228,8 +225,6 @@ set tabstop=4
 set softtabstop=4
 " horizontal splits come below
 set splitbelow
-" vertical splits on the right
-"set splitright
 " see differences between current file and file it was loaded from
 if !exists(":DiffOrig")
   command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
@@ -239,6 +234,7 @@ endif
 "" mappings
 " map f9 to open spellcheck
 map <F9> :setlocal spell! spelllang=en_us<CR>
+" map f8 to spanish spellcheck
 map <F8> :setlocal spell! spelllang=es<CR>
 " easy vertical split control
 set wmw=0
@@ -268,6 +264,7 @@ map Q gq
 inoremap <C-U> <C-G>u<C-U>
 " remap leader to comma
 let mapleader = ","
+" remap local leader to double backslash
 let maplocalleader = "\\"
 
 " miscellaneous
@@ -282,5 +279,3 @@ if has("autocmd")
 else
   set autoindent		" always set autoindenting on
 endif " has("autocmd")
-
-""" END GENERAL SETTINGS
