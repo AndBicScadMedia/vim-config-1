@@ -1,7 +1,11 @@
+:AirlineTheme	airline.txt	/*:AirlineTheme*
 airline	airline.txt	/*airline*
+airline-commands	airline.txt	/*airline-commands*
 airline-configuration	airline.txt	/*airline-configuration*
 airline-contributions	airline.txt	/*airline-contributions*
 airline-customization	airline.txt	/*airline-customization*
 airline-license	airline.txt	/*airline-license*
 airline-name	airline.txt	/*airline-name*
+airline-themes	airline.txt	/*airline-themes*
+airline-troubleshooting	airline.txt	/*airline-troubleshooting*
 airline.txt	airline.txt	/*airline.txt*
