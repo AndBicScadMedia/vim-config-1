@@ -173,6 +173,8 @@ if &t_Co > 2 || has("gui_running")
 endif
 
 "" behavioral settings
+" don't assume the next line is a comment just because this one is
+au FileType * setlocal formatoptions-=cro
 " determine that the .vimrc file is a .vim file
 au BufRead,BufNewFile *.vimrc set filetype=vim
 " auto read outside changes
