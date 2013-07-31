@@ -65,14 +65,16 @@ command CB call CenterBuf()
 filetype plugin indent on
 
 "" airline settings
+" change theme
+let g:airline_theme = 'luna'
 " remove seperators
 let g:airline_left_sep=''
 let g:airline_right_sep=''
 " remove unused modes
-let g:airline_enable_fugitive=0
+let g:airline_enable_branch=0
 let g:airline_enable_syntastic=0
 " further customization
-" set second section to filename
+" set third section to filename
 let g:airline_section_b="%f"
 " empty third and fourth sections
 let g:airline_section_c=""
