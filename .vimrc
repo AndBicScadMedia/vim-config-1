@@ -65,8 +65,6 @@ command CB call CenterBuf()
 filetype plugin indent on
 
 "" airline settings
-" change theme
-let g:airline_theme = 'luna'
 " remove seperators
 let g:airline_left_sep=''
 let g:airline_right_sep=''
