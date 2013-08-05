@@ -1,7 +1,7 @@
 " Plugin:      https://github.com/mhinz/vim-startify
 " Description: Start screen displaying recently used stuff.
 " Maintainer:  Marco Hinz <http://github.com/mhinz>
-" Version:     1.6
+" Version:     1.7
 
 if exists('g:autoloaded_startify') || &cp
   finish
@@ -9,10 +9,11 @@ endif
 let g:autoloaded_startify = 1
 
 " Init: values {{{1
-let s:cmd          = (get(g:, 'startify_change_to_dir', 1) ? ' <bar> lcd %:h' : '') . '<cr>'
-let s:numfiles     = get(g:, 'startify_files_number', 10)
-let s:show_special = get(g:, 'startify_enable_special', 1)
-let s:session_dir  = resolve(expand(get(g:, 'startify_session_dir',
+let s:cmd              = (get(g:, 'startify_change_to_dir', 1) ? ' <bar> lcd %:h' : '') . '<cr>'
+let s:numfiles         = get(g:, 'startify_files_number', 10)
+let s:show_special     = get(g:, 'startify_enable_special', 1)
+let s:restore_position = get(g:, 'startify_restore_position')
+let s:session_dir      = resolve(expand(get(g:, 'startify_session_dir',
       \ has('win32') ? '$HOME\vimfiles\session' : '~/.vim/session')))
 
 " Function: #insane_in_the_membrane {{{1
@@ -25,11 +26,9 @@ function! startify#insane_in_the_membrane() abort
     endfor
   endif
 
-  enew
-  setfiletype startify
-
   setlocal noswapfile nobuflisted buftype=nofile bufhidden=wipe
   setlocal nonumber nolist statusline=\ startify
+  setfiletype startify
 
   if v:version >= 703
     setlocal norelativenumber
@@ -72,6 +71,9 @@ function! startify#insane_in_the_membrane() abort
   endif
 
   autocmd startify CursorMoved <buffer> call s:set_cursor()
+  if s:restore_position
+    autocmd startify BufReadPost * call s:restore_position()
+  endif
 
   1
   call cursor((s:show_special ? 4 : 2) + s:offset_header, 5)
@@ -218,30 +220,32 @@ function! s:show_files(cnt) abort
   let num     = s:numfiles
   let entries = {}
 
-  for fname in v:oldfiles
-    let fullpath = resolve(fnamemodify(fname, ':p'))
+  if !empty(v:oldfiles)
+    for fname in v:oldfiles
+      let fullpath = resolve(fnamemodify(fname, ':p'))
 
-    " filter duplicates, bookmarks and entries from the skiplist
-    if has_key(entries, fullpath)
-          \ || !filereadable(fullpath)
-          \ || (exists('g:startify_skiplist')  && s:is_in_skiplist(fullpath))
-          \ || (exists('g:startify_bookmarks') && s:is_bookmark(fullpath))
-      continue
-    endif
+      " filter duplicates, bookmarks and entries from the skiplist
+      if has_key(entries, fullpath)
+            \ || !filereadable(fullpath)
+            \ || (exists('g:startify_skiplist')  && s:is_in_skiplist(fullpath))
+            \ || (exists('g:startify_bookmarks') && s:is_bookmark(fullpath))
+        continue
+      endif
 
-    let entries[fullpath] = 1
-    let index = s:get_index_as_string(cnt)
+      let entries[fullpath] = 1
+      let index = s:get_index_as_string(cnt)
 
-    call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
-    execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) s:cmd
+      call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
+      execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) s:cmd
 
-    let cnt += 1
-    let num -= 1
+      let cnt += 1
+      let num -= 1
 
-    if !num
-      break
-    endif
-  endfor
+      if !num
+        break
+      endif
+    endfor
+  endif
 
   return cnt
 endfunction
@@ -408,6 +412,14 @@ function! s:get_index_as_string(idx) abort
     return (a:idx < listlen) ? g:startify_custom_indices[a:idx] : string(a:idx - listlen)
   else
     return string(a:idx)
+  endif
+endfunction
+
+" Function: s:restore_position {{{1
+function! s:restore_position() abort
+  autocmd! startify *
+  if line("'\"") > 0 && line("'\"") <= line('$')
+    call cursor(getpos("'\"")[1:])
   endif
 endfunction
 

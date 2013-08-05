@@ -1,4 +1,6 @@
+" MIT license. Copyright (c) 2013 Bailey Ling.
 " vim: ts=2 sts=2 sw=2 fdm=indent
+
 let s:is_win32term = (has('win32') || has('win64')) && !has('gui_running')
 let s:sections = ['a','b','c','gutter','x','y','z']
 
@@ -50,49 +52,16 @@ function! airline#highlight(modes)
   endfor
 endfunction
 
-function! s:is_excluded_window()
-  for Fn in g:airline_exclude_funcrefs
-    if Fn()
-      return 1
-    endif
-  endfor
-  return 0
-endfunction
-
-function! s:apply_window_overrides()
-  unlet! w:airline_left_only
-  for section in s:sections
-    unlet! w:airline_section_{section}
-  endfor
-  for Fn in g:airline_window_override_funcrefs
-    call Fn()
-  endfor
-endfunction
-
-function! airline#update_externals()
-  let g:airline_externals_bufferline = g:airline_enable_bufferline && exists('*bufferline#get_status_string')
-        \ ? '%{bufferline#refresh_status()}'.bufferline#get_status_string() : "%f%m"
-  let g:airline_externals_syntastic = g:airline_enable_syntastic && exists('*SyntasticStatuslineFlag')
-        \ ? '%{SyntasticStatuslineFlag()}' : ''
-  let g:airline_externals_branch = g:airline_enable_branch
-        \ ? (exists('*fugitive#head') && strlen(fugitive#head()) > 0
-          \ ? g:airline_branch_prefix.fugitive#head()
-          \ : exists('*lawrencium#statusline') && strlen(lawrencium#statusline()) > 0
-            \ ? g:airline_branch_prefix.lawrencium#statusline()
-            \ : '')
-        \ : ''
-  let g:airline_externals_tagbar = g:airline_enable_tagbar && exists(':Tagbar')
-        \ ? '%(%{tagbar#currenttag("%s","")} '.g:airline_right_alt_sep.'%)' : ''
-endfunction
-
+" for 7.2 compatibility
 function! s:getwinvar(winnr, key, ...)
-  " for 7.2 compatibility
   let winvals = getwinvar(a:winnr, '')
   return get(winvals, a:key, (a:0 ? a:1 : ''))
 endfunction
 
-function! s:get_section(winnr, key)
-  return s:getwinvar(a:winnr, 'airline_section_'.a:key, g:airline_section_{a:key})
+function! s:get_section(winnr, key, ...)
+  let text = s:getwinvar(a:winnr, 'airline_section_'.a:key, g:airline_section_{a:key})
+  let [prefix, suffix] = [get(a:000, 0, '%( '), get(a:000, 1, ' %)')]
+  return empty(text) ? '' : prefix.text.suffix
 endfunction
 
 function! s:get_statusline(winnr, active)
@@ -105,46 +74,53 @@ function! s:get_statusline(winnr, active)
 
   let sl = '%{airline#update_highlight()}'
   if a:active || s:getwinvar(a:winnr, 'airline_left_only', 0)
-    let sl.=l:mode_color.' '.s:get_section(a:winnr, 'a').' '
+    let sl.=l:mode_color.s:get_section(a:winnr, 'a')
     let sl.='%{g:airline_detect_paste && &paste ? g:airline_paste_symbol." " : ""}'
     let sl.=l:mode_sep_color
     let sl.=a:active ? g:airline_left_sep : g:airline_left_alt_sep
     let sl.=l:info_color
-    let sl.=' '.s:get_section(a:winnr, 'b').' '
+    let sl.=s:get_section(a:winnr, 'b')
     let sl.=l:info_sep_color
     let sl.=g:airline_left_sep
-    let sl.=l:status_color.' %<'.s:get_section(a:winnr, 'c').' '
-    let gutter = s:getwinvar(a:winnr, 'airline_section_gutter', get(g:, 'airline_section_gutter', ''))
-    let sl.=gutter != ''
-          \ ? gutter
-          \ : '%#warningmsg#'.g:airline_externals_syntastic.l:file_flag_color."%{&ro ? g:airline_readonly_symbol : ''}".l:status_color
+    let sl.=l:status_color.'%<'.s:get_section(a:winnr, 'c')
+    let sl.=' '.l:file_flag_color."%(%{&ro ? g:airline_readonly_symbol : ''}%)".l:status_color
+    let sl.=s:get_section(a:winnr, 'gutter', '', '')
+    let sl.=l:status_color
   else
     let sl.=l:status_color.' %f%m'
   endif
   if !s:getwinvar(a:winnr, 'airline_left_only', 0)
-    let sl.='%='.g:airline_externals_tagbar
-    let sl.=' '.s:get_section(a:winnr, 'x').' '
+    let sl.='%='
+    let sl.=s:get_section(a:winnr, 'x')
     let sl.=l:info_sep_color
     let sl.=a:active ? g:airline_right_sep : g:airline_right_alt_sep
     let sl.=l:info_color
-    let sl.=' '.s:get_section(a:winnr, 'y').' '
+    let sl.=s:get_section(a:winnr, 'y')
     let sl.=l:mode_sep_color
     let sl.=a:active ? g:airline_right_sep : g:airline_right_alt_sep
     let sl.=l:mode_color
-    let sl.=' '.s:get_section(a:winnr, 'z').' '
+    let sl.=s:get_section(a:winnr, 'z')
   endif
   return sl
 endfunction
 
 function! airline#update_statusline()
-  let w:airline_active = 1
-  if s:is_excluded_window()
-    call setwinvar(winnr(), '&statusline', '')
-    return
-  endif
+  for i in range(0, len(g:airline_exclude_funcrefs) - 1)
+    if g:airline_exclude_funcrefs[i]()
+      call setwinvar(winnr(), '&statusline', '')
+      return
+    endif
+  endfor
 
-  call airline#update_externals()
-  call s:apply_window_overrides()
+  unlet! w:airline_left_only
+  for section in s:sections
+    unlet! w:airline_section_{section}
+  endfor
+  for i in range(0, len(g:airline_statusline_funcrefs) - 1)
+    call g:airline_statusline_funcrefs[i]()
+  endfor
+
+  let w:airline_active = 1
   call setwinvar(winnr(), '&statusline', s:get_statusline(winnr(), 1))
 
   for nr in range(1, winnr('$'))

@@ -1,9 +1,28 @@
+" MIT license. Copyright (c) 2013 Bailey Ling.
+" vim: ts=2 sts=2 sw=2 fdm=indent
+
 function! airline#extensions#apply_left_override(section1, section2)
   let w:airline_section_a = a:section1
   let w:airline_section_b = a:section2
   let w:airline_section_c = ''
   let w:airline_section_gutter = ' '
   let w:airline_left_only = 1
+endfunction
+
+function! airline#extensions#update_external_values()
+  let g:airline_externals_bufferline = g:airline_enable_bufferline && exists('*bufferline#get_status_string')
+        \ ? '%{bufferline#refresh_status()}'.bufferline#get_status_string() : "%f%m"
+  let g:airline_externals_syntastic = g:airline_enable_syntastic && exists('*SyntasticStatuslineFlag')
+        \ ? '%#warningmsg#%{SyntasticStatuslineFlag()}' : ''
+  let g:airline_externals_branch = g:airline_enable_branch
+        \ ? (exists('*fugitive#head') && strlen(fugitive#head()) > 0
+          \ ? g:airline_branch_prefix.fugitive#head()
+          \ : exists('*lawrencium#statusline') && strlen(lawrencium#statusline()) > 0
+            \ ? g:airline_branch_prefix.lawrencium#statusline()
+            \ : '')
+        \ : ''
+  let g:airline_externals_tagbar = g:airline_enable_tagbar && exists(':Tagbar')
+        \ ? '%(%{tagbar#currenttag("%s","")} '.g:airline_right_alt_sep.' %)' : ''
 endfunction
 
 function! airline#extensions#apply_window_overrides()
@@ -47,6 +66,8 @@ function! airline#extensions#apply_window_overrides()
     call airline#extensions#apply_left_override('vimfiler', '%{vimfiler#get_status_string()}')
   elseif &ft == 'minibufexpl'
     call airline#extensions#apply_left_override('MiniBufExplorer', '')
+  elseif &ft == 'startify'
+    call airline#extensions#apply_left_override('startify', '')
   endif
 endfunction
 
@@ -92,7 +113,7 @@ function! airline#extensions#load()
   endif
 
   if get(g:, 'command_t_loaded', 0)
-    call add(g:airline_window_override_funcrefs, function('airline#extensions#commandt#apply_window_override'))
+    call add(g:airline_statusline_funcrefs, function('airline#extensions#commandt#apply_window_override'))
   endif
 
   if g:airline_enable_bufferline && get(g:, 'loaded_bufferline', 0)
@@ -105,7 +126,10 @@ function! airline#extensions#load()
     let g:bufferline_separator = ' '
   endif
 
-  call add(g:airline_window_override_funcrefs, function('airline#extensions#apply_window_overrides'))
+  call add(g:airline_statusline_funcrefs, function('airline#extensions#update_external_values'))
+  call add(g:airline_statusline_funcrefs, function('airline#extensions#apply_window_overrides'))
   call add(g:airline_exclude_funcrefs, function('airline#extensions#is_excluded_window'))
+
+  call airline#extensions#update_external_values()
 endfunction
 
