@@ -70,6 +70,7 @@ Plugins Installed
 - **[ctrlp:](http://kien.github.com/ctrlp.vim/)** easy full-path fuzzy file finder
 - **[SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643)** insert-mode tab-key autocompletion
 - **[Vim-Airline:](https://github.com/bling/vim-airline)** a light-weight statusline replacement
+- **[vim-endwise:(https://github.com/tpope/vim-endwise)** autoinsert "end" for Ruby
 - **[Vim-Latex:](http://vim-latex.sourceforge.net/)** tools for LaTeX editing in vim
 - **[vim-markdown:](https://github.com/tpope/vim-markdown)** adds markdown syntax detection for vim
 - **[vim-startify:](https://github.com/mhinz/vim-startify)** gives me a nice startup page for vim

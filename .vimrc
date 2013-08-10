@@ -108,7 +108,7 @@ let g:Tex_ViewRule_pdf = 'Skim'
 
 "" supertab settings
 " utilize vim's omnicomplete (disabled for now)
-let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabDefaultCompletionType = 'context'
 
 "" END PLUGIN SETTINGS
 
