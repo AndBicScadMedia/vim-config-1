@@ -9,12 +9,14 @@ endif
 let g:autoloaded_startify = 1
 
 " Init: values {{{1
-let s:cmd              = (get(g:, 'startify_change_to_dir', 1) ? ' <bar> lcd %:h' : '') . '<cr>'
 let s:numfiles         = get(g:, 'startify_files_number', 10)
 let s:show_special     = get(g:, 'startify_enable_special', 1)
 let s:restore_position = get(g:, 'startify_restore_position')
-let s:session_dir      = resolve(expand(get(g:, 'startify_session_dir',
+
+let s:session_dir = resolve(expand(get(g:, 'startify_session_dir',
       \ has('win32') ? '$HOME\vimfiles\session' : '~/.vim/session')))
+
+let s:chdir = (get(g:, 'startify_change_to_dir', 1) ? '<bar> if isdirectory(expand("%")) <bar> lcd % <bar> else <bar> lcd %:h <bar> endif' : '') .'<cr>'
 
 " Function: #insane_in_the_membrane {{{1
 function! startify#insane_in_the_membrane() abort
@@ -44,6 +46,12 @@ function! startify#insane_in_the_membrane() abort
 
   if s:show_special
     call append('$', ['   [e]  <empty buffer>', ''])
+  endif
+
+  if get(g:, 'startify_session_detection', 1) && filereadable('Session.vim')
+    call append('$', ['   [0]  Session.vim', ''])
+    execute 'nnoremap <buffer> 0 :source Session.vim<cr>'
+    let cnt = 1
   endif
 
   for list in get(g:, 'startify_list_order', ['files', 'sessions', 'bookmarks'])
@@ -181,6 +189,7 @@ endfunction
 " Function: s:show_dir {{{1
 function! s:show_dir(cnt) abort
   let cnt   = a:cnt
+  let num   = s:numfiles
   let files = []
 
   for fname in split(glob('.\=*'))
@@ -205,8 +214,9 @@ function! s:show_dir(cnt) abort
     execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) '<cr>'
 
     let cnt += 1
+    let num -= 1
 
-    if (cnt == s:numfiles)
+    if !num
       break
     endif
   endfor
@@ -236,7 +246,7 @@ function! s:show_files(cnt) abort
       let index = s:get_index_as_string(cnt)
 
       call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
-      execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) s:cmd
+      execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) s:chdir
 
       let cnt += 1
       let num -= 1
@@ -265,7 +275,7 @@ function! s:show_sessions(cnt) abort
     let index = s:get_index_as_string(idx)
 
     call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fnamemodify(sfiles[i], ':t:r'))
-    execute 'nnoremap <buffer> '. index .' :source '. fnameescape(sfiles[i]) .'<cr>'
+    execute 'nnoremap <buffer>' index ':source' fnameescape(sfiles[i]) '<cr>'
   endfor
 
   return idx
@@ -281,7 +291,7 @@ function! s:show_bookmarks(cnt) abort
       let index = s:get_index_as_string(cnt)
 
       call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
-      execute 'nnoremap <buffer> '. index .' :edit '. fnameescape(fname) . s:cmd
+      execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) s:chdir
     endfor
   endif
 
@@ -328,67 +338,84 @@ endfunction
 " Function: s:set_mark {{{1
 "
 " Markers are saved in the s:marked dict using the follow format:
-"   - s:marked[0]: ID (for sorting)
-"   - s:marked[1]: what the brackets contained before
-"   - s:marked[2]: the actual path
-"   - s:marked[3]: type (buffer, split, vsplit)
+"   - s:marked[0]: ID
+"   - s:marked[1]: path
+"   - s:marked[2]: type (buffer, split, vsplit)
 "
 function! s:set_mark(type) abort
   if !exists('s:marked')
     let s:marked  = {}
-    let s:nmarked = 0
   endif
-  " matches[1]: content between brackets
-  " matches[2]: path
-  let matches = matchlist(getline('.'), '\v\[(.*)\]\s+(.*)')
-  if matches[2] =~ '\V<empty buffer>\|<quit>' || matches[2] =~ '^\w\+$'
+
+  let [id, path] = matchlist(getline('.'), '\v\[(.*)\]\s+(.*)')[1:2]
+
+  if path =~# '\V<empty buffer>\|<quit>'
     return
   endif
+
   setlocal modifiable
-  if matches[1] =~ 'B\|S\|V'
-    let s:nmarked -= 1
-    execute 'normal! ci]'. remove(s:marked, line('.'))[1]
+
+  " set markers
+  if id =~# '[BSV]'
+    " replace marker by old ID
+    execute 'normal! ci]'. remove(s:marked, line('.'))[0]
   else
-    let s:marked[line('.')] = [s:nmarked, matches[1], matches[2], a:type]
-    let s:nmarked += 1
-    execute 'normal! ci]'. repeat(a:type, len(matches[1]))
+    " save ID and replace it by the marker of the given type
+    let s:marked[line('.')] = [id, path, a:type]
+    execute 'normal! ci]'. repeat(a:type, len(id))
   endif
+
   setlocal nomodifiable nomodified
 endfunction
 
 " Function: s:open_buffers {{{1
 function! s:open_buffers(cword) abort
+  " markers found; open one or more buffers
   if exists('s:marked') && !empty(s:marked)
     enew
     setlocal nobuflisted
-    for i in range(len(s:marked))
-      for val in values(s:marked)
-        if val[0] == i
-          if val[3] == 'S'
-            if line2byte('$') == -1
-              execute 'edit' val[2]
-            else
-              execute 'split' val[2]
-            endif
-          elseif val[3] == 'V'
-            if line2byte('$') == -1
-              execute 'edit' val[2]
-            else
-              execute 'vsplit' val[2]
-            endif
-          else
-            execute 'edit' val[2]
-          endif
-          continue
+
+    for val in values(s:marked)
+      let [path, type] = val[1:2]
+      " open in split
+      if type == 'S'
+        if line2byte('$') == -1
+          execute 'edit' path
+        else
+          execute 'split' path
         endif
-      endfor
+      " open in vsplit
+      elseif type == 'V'
+        if line2byte('$') == -1
+          execute 'edit' path
+        else
+          execute 'vsplit' path
+        endif
+      " open in current window
+      else
+        execute 'edit' path
+      endif
+      call s:chdir()
     endfor
+
+    " remove markers for next instance of :Startify
+    if exists('s:marked')
+      unlet s:marked
+    endif
+  " no markers found; open a single buffer
   else
     execute 'normal' a:cword
   endif
-  if exists('s:marked')
-    unlet s:marked
-    unlet s:nmarked
+endfunction
+
+" Function: s:chdir {{{1
+function! s:chdir() abort
+  if get(g:, 'startify_change_to_dir', 1)
+    if isdirectory(expand('%'))
+      lcd %
+    else
+      lcd %:h
+    endif
   endif
 endfunction
 

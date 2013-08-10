@@ -1,4 +1,5 @@
 :AirlineTheme	airline.txt	/*:AirlineTheme*
+:AirlineToggleWhitespace	airline.txt	/*:AirlineToggleWhitespace*
 airline	airline.txt	/*airline*
 airline-commands	airline.txt	/*airline-commands*
 airline-configuration	airline.txt	/*airline-configuration*

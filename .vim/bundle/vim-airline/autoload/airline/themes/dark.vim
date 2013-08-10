@@ -23,10 +23,10 @@
 "
 " The array is in the format [ guifg, guibg, ctermfg, ctermbg, opts ].
 " The opts takes in values from ":help attr-list".
-let s:file = [ '#ff0000' , '#1c1c1c' , 160 , 233 , '' ]
-let s:N1 = [ '#00005f' , '#dfff00' , 17  , 190 ]
-let s:N2 = [ '#ffffff' , '#444444' , 255 , 238 ]
-let s:N3 = [ '#9cffd3' , '#202020' , 85  , 234 ]
+let s:file = [ '#ff0000' , ''        , 160 , ''    , '' ]
+let s:N1   = [ '#00005f' , '#dfff00' , 17  , 190 ]
+let s:N2   = [ '#ffffff' , '#444444' , 255 , 238 ]
+let s:N3   = [ '#9cffd3' , '#202020' , 85  , 234 ]
 
 " vim-airline is made up of multiple sections, but for theming purposes there
 " is only 3 sections: the mode, the branch indicator, and the gutter (which
@@ -85,3 +85,14 @@ let g:airline#themes#dark#inactive_modified = {
       \ 'statusline': [ '#5f005f' , '' , '53' , '' , '' ] ,
       \ }
 
+
+" Here we define the color map for ctrlp.  We check for the g:loaded_ctrlp
+" variable so that related functionality is loaded iff the user is using
+" ctrlp. Note that this is optional, and if you do not define ctrlp colors
+" they will be chosen automatically from the existing palette.
+if get(g:, 'loaded_ctrlp', 0)
+  let g:airline#themes#dark#ctrlp = airline#extensions#ctrlp#generate_color_map(
+        \ [ '#d7d7ff' , '#5f00af' , 189 , 55  , ''     ],
+        \ [ '#ffffff' , '#875fd7' , 231 , 98  , ''     ],
+        \ [ '#5f00af' , '#ffffff' , 55  , 231 , 'bold' ])
+endif

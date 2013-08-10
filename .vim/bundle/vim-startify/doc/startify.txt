@@ -88,7 +88,7 @@ The default for Windows systems is '$HOME\vimfiles\session'.
 
 ============-
 
-    let g:startify_lists = ['files', 'sessions', 'bookmarks']
+    let g:startify_list_order = ['files', 'sessions', 'bookmarks']
 
 At the moment startify can show these kind of lists:
 
@@ -115,7 +115,7 @@ At the moment startify can show these kind of lists:
 
 Therefore, to show all of them in the above order:
 
-    let g:startify_lists = ['files', 'dir', 'bookmarks', 'sessions']
+    let g:startify_list_order = ['files', 'dir', 'bookmarks', 'sessions']
 
 
 ============-
@@ -133,6 +133,14 @@ Example: let g:startify_bookmarks = [ '~/.vimrc' ]
     let g:startify_files_number = 10
 
 The number of files to list.
+
+
+============-
+
+    let g:startify_session_detection = 1
+
+When the file Session.vim is found in the current directory, it will be shown at
+the top of all lists as entry [0].
 
 
 ============-
@@ -291,8 +299,22 @@ Example: (my terminal emulator supports 256 colors)
 ==============================================================================
 6. FAQ (Or: Typical rants)                                        *startify-faq*
 
-"I don't want the start screen to use cursorline!"
---------------------------------------------------
+
+How do I get both NERDTree and Startify working at startup?
+-----------------------------------------------------------
+
+Put this in your vimrc:
+
+    autocmd VimEnter *
+                \ if !argc() |
+                \   Startify |
+                \   NERDTree |
+                \   execute "normal \<c-w>w" |
+                \ endif
+
+
+I don't want the start screen to use cursorline!
+------------------------------------------------
 
 Startify sets its own filetype "startify". Thus one could set buffer-local
 options like this:
@@ -300,14 +322,14 @@ options like this:
     autocmd FileType startify setlocal nocursorline
 
 
-"Last recently used files don't seem to get updated at :Startify!"
------------------------------------------------------------
+Last recently used files don't seem to get updated at :Startify!
+----------------------------------------------------------------
 
 It's because Vim loads the list from viminfo only once, at startup.
 
 
-"I use iTerm2 and have broken colors when using sessions!"
-----------------------------------------------------------
+I use iTerm2 and have broken colors when using sessions!
+--------------------------------------------------------
 
 Nothing this plugin could do about. Try playing around with 'sessionoptions'.
 Some people swear it works for them with these settings:
