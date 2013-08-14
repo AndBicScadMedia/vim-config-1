@@ -3,7 +3,7 @@
 " Maintainer:  Marco Hinz <http://github.com/mhinz>
 " Version:     1.7
 
-if exists('g:autoloaded_startify') || &cp
+if exists('g:autoloaded_startify') || &compatible
   finish
 endif
 let g:autoloaded_startify = 1
@@ -12,11 +12,24 @@ let g:autoloaded_startify = 1
 let s:numfiles         = get(g:, 'startify_files_number', 10)
 let s:show_special     = get(g:, 'startify_enable_special', 1)
 let s:restore_position = get(g:, 'startify_restore_position')
-
-let s:session_dir = resolve(expand(get(g:, 'startify_session_dir',
+let s:session_dir      = resolve(expand(get(g:, 'startify_session_dir',
       \ has('win32') ? '$HOME\vimfiles\session' : '~/.vim/session')))
 
-let s:chdir = (get(g:, 'startify_change_to_dir', 1) ? '<bar> if isdirectory(expand("%")) <bar> lcd % <bar> else <bar> lcd %:h <bar> endif' : '') .'<cr>'
+" Init: autocmds {{{1
+
+if get(g:, 'startify_session_persistence')
+  autocmd startify VimLeave *
+        \ if exists('v:this_session') && filewritable(v:this_session) |
+        \   execute 'mksession!' fnameescape(v:this_session) |
+        \ endif
+endif
+
+" Function: #get_separator {{{1
+function! startify#get_separator() abort
+  return !exists('+shellslash') || &shellslash ? '/' : '\'
+endfunction
+
+let s:sep = startify#get_separator()
 
 " Function: #insane_in_the_membrane {{{1
 function! startify#insane_in_the_membrane() abort
@@ -49,7 +62,7 @@ function! startify#insane_in_the_membrane() abort
   endif
 
   if get(g:, 'startify_session_detection', 1) && filereadable('Session.vim')
-    call append('$', ['   [0]  Session.vim', ''])
+    call append('$', ['   [0]  '. getcwd() . s:sep .'Session.vim', ''])
     execute 'nnoremap <buffer> 0 :source Session.vim<cr>'
     let cnt = 1
   endif
@@ -96,7 +109,7 @@ function! startify#session_load(...) abort
     echo 'There are no sessions...'
     return
   endif
-  let spath = s:session_dir . startify#get_separator() . (exists('a:1')
+  let spath = s:session_dir . s:sep . (exists('a:1')
         \ ? a:1
         \ : input('Load this session: ', fnamemodify(v:this_session, ':t'), 'custom,startify#session_list_as_string'))
         \ | redraw
@@ -111,7 +124,7 @@ endfunction
 function! startify#session_save(...) abort
   if !isdirectory(s:session_dir)
     if exists('*mkdir')
-      echo 'The session directory does not exist: '. s:session_dir .'. Create it?  [y/n]' | redraw
+      echo 'The session directory does not exist: '. s:session_dir .'. Create it?  [y/n]'
       if (nr2char(getchar()) == 'y')
         call mkdir(s:session_dir, 'p')
       else
@@ -123,6 +136,7 @@ function! startify#session_save(...) abort
       return
     endif
   endif
+
   if exists('a:1')
     let sname = a:1
   else
@@ -133,11 +147,13 @@ function! startify#session_save(...) abort
       return
     endif
   endif
-  let spath = s:session_dir . startify#get_separator() . sname
+
+  let spath = s:session_dir . s:sep . sname
   if !filereadable(spath)
     execute 'mksession '. fnameescape(spath) | echo 'Session saved under: '. spath
     return
   endif
+
   echo 'Session already exists. Overwrite?  [y/n]' | redraw
   if nr2char(getchar()) == 'y'
     execute 'mksession! '. fnameescape(spath) | echo 'Session saved under: '. spath
@@ -155,10 +171,12 @@ function! startify#session_delete(...) abort
     echo 'There are no sessions...'
     return
   endif
-  let spath = s:session_dir . startify#get_separator() . (exists('a:1')
+
+  let spath = s:session_dir . s:sep . (exists('a:1')
         \ ? a:1
         \ : input('Delete this session: ', fnamemodify(v:this_session, ':t'), 'custom,startify#session_list_as_string'))
         \ | redraw
+
   echo 'Really delete '. spath .'? [y/n]' | redraw
   if (nr2char(getchar()) == 'y')
     if delete(spath) == 0
@@ -179,11 +197,6 @@ endfunction
 " Function: #session_list_as_string {{{1
 function! startify#session_list_as_string(lead, ...) abort
   return join(map(split(globpath(s:session_dir, '*'.a:lead.'*'), '\n'), 'fnamemodify(v:val, ":t")'), "\n")
-endfunction
-
-" Function: #get_separator {{{1
-function! startify#get_separator() abort
-  return !exists('+shellslash') || &shellslash ? '/' : '\'
 endfunction
 
 " Function: s:show_dir {{{1
@@ -246,7 +259,7 @@ function! s:show_files(cnt) abort
       let index = s:get_index_as_string(cnt)
 
       call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
-      execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) s:chdir
+      execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) '<bar> call <sid>check_user_options()<cr>'
 
       let cnt += 1
       let num -= 1
@@ -278,7 +291,7 @@ function! s:show_sessions(cnt) abort
     execute 'nnoremap <buffer>' index ':source' fnameescape(sfiles[i]) '<cr>'
   endfor
 
-  return idx
+  return idx + 1
 endfunction
 
 " Function: s:show_bookmarks {{{1
@@ -287,11 +300,12 @@ function! s:show_bookmarks(cnt) abort
 
   if exists('g:startify_bookmarks')
     for fname in g:startify_bookmarks
-      let cnt  += 1
       let index = s:get_index_as_string(cnt)
 
       call append('$', '   ['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
-      execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) s:chdir
+      execute 'nnoremap <buffer>' index ':edit' fnameescape(fname) '<bar> call <sid>check_user_options()<cr>'
+
+      let cnt += 1
     endfor
   endif
 
@@ -377,6 +391,7 @@ function! s:open_buffers(cword) abort
 
     for val in values(s:marked)
       let [path, type] = val[1:2]
+
       " open in split
       if type == 'S'
         if line2byte('$') == -1
@@ -395,7 +410,8 @@ function! s:open_buffers(cword) abort
       else
         execute 'edit' path
       endif
-      call s:chdir()
+
+      call s:check_user_options()
     endfor
 
     " remove markers for next instance of :Startify
@@ -408,10 +424,17 @@ function! s:open_buffers(cword) abort
   endif
 endfunction
 
-" Function: s:chdir {{{1
-function! s:chdir() abort
-  if get(g:, 'startify_change_to_dir', 1)
-    if isdirectory(expand('%'))
+" Function: s:check_user_options {{{1
+function! s:check_user_options() abort
+  let path    = expand('%')
+  let session = path . s:sep .'Session.vim'
+
+  " autoload session
+  if get(g:, 'startify_session_autoload') && filereadable(session)
+    execute 'source' session
+  " change directory
+  elseif get(g:, 'startify_change_to_dir', 1)
+    if isdirectory(path)
       lcd %
     else
       lcd %:h

@@ -70,7 +70,7 @@ function! s:get_section(winnr, key, ...)
   return empty(text) ? '' : prefix.text.suffix
 endfunction
 
-function! s:get_statusline(winnr, active)
+function! airline#get_statusline(winnr, active)
   let l:mode_color      = a:active ? "%#Al2#" : "%#Al2_inactive#"
   let l:mode_sep_color  = a:active ? "%#Al3#" : "%#Al3_inactive#"
   let l:info_color      = a:active ? "%#Al4#" : "%#Al4_inactive#"
@@ -79,7 +79,7 @@ function! s:get_statusline(winnr, active)
   let l:file_flag_color = a:active ? "%#Al7#" : "%#Al7_inactive#"
 
   let sl = '%{airline#update_highlight()}'
-  if s:getwinvar(a:winnr, 'airline_render_left', a:active)
+  if s:getwinvar(a:winnr, 'airline_render_left', a:active || (!a:active && !g:airline_inactive_collapse))
     let sl.=l:mode_color.s:get_section(a:winnr, 'a')
     let sl.='%{g:airline_detect_paste && &paste ? g:airline_paste_symbol." " : ""}'
     let sl.=l:mode_sep_color
@@ -89,14 +89,12 @@ function! s:get_statusline(winnr, active)
     let sl.=l:info_sep_color
     let sl.=g:airline_left_sep
     let sl.=l:status_color.'%<'.s:get_section(a:winnr, 'c')
-    let sl.=' '.l:file_flag_color."%(%{&ro ? g:airline_readonly_symbol : ''}%)".l:status_color
-    let sl.=s:get_section(a:winnr, 'gutter', '', '')
-    let sl.=l:status_color
+    let sl.=' '.l:file_flag_color."%(%{&ro ? g:airline_readonly_symbol : ''}%)"
   else
     let sl.=l:status_color.' %f%m'
   endif
+  let sl.=l:status_color.s:get_section(a:winnr, 'gutter', '', '').l:status_color
   if s:getwinvar(a:winnr, 'airline_render_right', 1)
-    let sl.='%='
     let sl.=s:get_section(a:winnr, 'x')
     let sl.=l:info_sep_color
     let sl.=a:active ? g:airline_right_sep : g:airline_right_alt_sep
@@ -109,7 +107,7 @@ function! s:get_statusline(winnr, active)
 
     if a:active
       let sl.='%(%#Al2_to_warningmsg#'.g:airline_right_sep
-      let sl.='%#warningmsg#'.s:getwinvar(a:winnr, 'airline_section_warning', '').'%)'
+      let sl.='%#warningmsg#'.s:get_section(a:winnr, 'warning', '', '').'%)'
     endif
   endif
   return sl
@@ -137,11 +135,9 @@ function! airline#update_statusline()
     return
   endif
 
-  for nr in range(1, winnr('$'))
-    if nr != winnr() && getwinvar(nr, 'airline_active')
-      call setwinvar(nr, '&statusline', s:get_statusline(nr, 0))
-      call setwinvar(nr, 'airline_active', 0)
-    endif
+  for nr in filter(range(1, winnr('$')), 'v:val != winnr()')
+    call setwinvar(nr, 'airline_active', 0)
+    call setwinvar(nr, '&statusline', airline#get_statusline(nr, 0))
   endfor
 
   let w:airline_active = 1
@@ -153,7 +149,7 @@ function! airline#update_statusline()
   endfor
   call airline#exec_funcrefs(g:airline_statusline_funcrefs, 0)
 
-  call setwinvar(winnr(), '&statusline', s:get_statusline(winnr(), 1))
+  call setwinvar(winnr(), '&statusline', airline#get_statusline(winnr(), 1))
 endfunction
 
 function! airline#update_highlight()
@@ -163,22 +159,15 @@ function! airline#update_highlight()
       let l:mode = ['insert']
     elseif l:m ==# "R"
       let l:mode = ['replace']
-    elseif l:m =~# '\v(v|V|)'
-      let l:mode = ['visual']
-    elseif l:m =~# '\v(s|S|)'
+    elseif l:m =~# '\v(v|V||s|S|)'
       let l:mode = ['visual']
     else
       let l:mode = ['normal']
     endif
-    let g:airline_current_mode_text = get(g:airline_mode_map, l:m, l:m)
-    if g:airline_detect_iminsert && &iminsert
-      if get(g:, 'airline_powerline_fonts', 0)
-        let g:airline_current_mode_text .= ' '.g:airline_left_alt_sep
-      endif
-      let g:airline_current_mode_text .= ' '.toupper(get(b:, 'keymap_name', 'lang'))
-    endif
+    let w:airline_current_mode = get(g:airline_mode_map, l:m, l:m)
   else
     let l:mode = ['inactive']
+    let w:airline_current_mode = get(g:airline_mode_map, '__')
   endif
 
   if g:airline_detect_modified && &modified | call add(l:mode, 'modified') | endif

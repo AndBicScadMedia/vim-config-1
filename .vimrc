@@ -18,13 +18,13 @@ Bundle 'gmarik/vundle'
 
 " My Bundles:
 Bundle 'kien/ctrlp.vim'
+Bundle 'mattn/emmet-vim'
 Bundle 'ervandew/supertab'
 Bundle 'bling/vim-airline'
 Bundle 'tpope/vim-endwise'
 Bundle 'git://git.code.sf.net/p/vim-latex/vim-latex'
 Bundle 'tpope/vim-markdown'
 Bundle 'mhinz/vim-startify'
-Bundle 'mattn/zencoding-vim'
 
 "" END BUNDLE MANAGEMENT
 
@@ -73,6 +73,8 @@ let g:airline_right_sep=''
 let g:airline_enable_branch=0
 let g:airline_enable_syntastic=0
 " further customization
+" disable whitespace/tabs detection
+let g:airline_detect_whitespace=0
 " set third section to filename
 let g:airline_section_b="%f"
 " empty third and fourth sections

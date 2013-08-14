@@ -6,13 +6,33 @@ Lean &amp; mean statusline for vim that's light as air.
 
 # Features
 
-*  tiny core (under 200 lines), written with extensibility in mind (specifically adhering to the [open/closed principle][8]).
+*  tiny core (under 200 lines), written with extensibility in mind ([open/closed principle][8]).
 *  integrates with a variety of plugins, including: [vim-bufferline][6], [fugitive][4], [unite][9], [ctrlp][10], [minibufexpl][15], [gundo][16], [undotree][17], [nerdtree][18], [tagbar][19], [syntastic][5] and [lawrencium][21].
 *  looks good with regular fonts and provides configuration points so you can use unicode or powerline symbols.
 *  optimized for speed; it loads in under a millisecond.
 *  fully customizable; if you know a little `statusline` syntax you can tweak it to your needs.
 *  extensive suite of themes for popular colorschemes including [solarized][23] (dark and light), [tomorrow][24] (all variants), [molokai][25], [jellybeans][26] and others; have a look at the [screenshots][14] in the wiki.
 *  supports 7.2 as the minimum Vim version
+
+# Extensions/Integration
+
+### [ctrlp.vim][10]
+![image](https://f.cloud.github.com/assets/306502/962258/7345a224-04ec-11e3-8b5a-f11724a47437.png)
+
+### [unite.vim][9]
+![image](https://f.cloud.github.com/assets/306502/962319/4d7d3a7e-04ed-11e3-9d59-ab29cb310ff8.png)
+
+### [tagbar][19]
+![image](https://f.cloud.github.com/assets/306502/962150/7e7bfae6-04ea-11e3-9e28-32af206aed80.png)
+
+### [csv.vim][28]
+![image](https://f.cloud.github.com/assets/306502/962204/cfc1210a-04eb-11e3-8a93-42e6bcd21efa.png)
+
+### [syntastic][5]
+![image](https://f.cloud.github.com/assets/306502/962864/9824c484-04f7-11e3-9928-da94f8c7da5a.png)
+
+### whitespace
+![image](https://f.cloud.github.com/assets/306502/962401/2a75385e-04ef-11e3-935c-e3b9f0e954cc.png)
 
 # Rationale
 
@@ -114,3 +134,4 @@ MIT license. Copyright (c) 2013 Bailey Ling.
 [25]: https://github.com/tomasr/molokai
 [26]: https://github.com/nanotech/jellybeans.vim
 [27]: https://github.com/bling/vim-airline/wiki/FAQ
+[28]: https://github.com/chrisbra/csv.vim

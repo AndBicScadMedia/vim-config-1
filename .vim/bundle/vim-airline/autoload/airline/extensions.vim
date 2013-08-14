@@ -17,17 +17,17 @@ let s:filetype_overrides = {
       \ 'undotree': [ 'undotree', '' ],
       \ 'gundo': [ 'Gundo', '' ],
       \ 'diff': [ 'diff', '' ],
-      \ 'vimshell': [ 'vimshell', '%{vimshell#get_status_string()}' ],
       \ 'vimfiler': [ 'vimfiler', '%{vimfiler#get_status_string()}' ],
       \ 'minibufexpl': [ 'MiniBufExplorer', '' ],
       \ 'startify': [ 'startify', '' ],
       \ }
 
+let s:filetype_regex_overrides = {}
+
 function! airline#extensions#apply_left_override(section1, section2)
   let w:airline_section_a = a:section1
   let w:airline_section_b = a:section2
   let w:airline_section_c = ''
-  let w:airline_section_gutter = ' '
   let w:airline_render_left = 1
   let w:airline_render_right = 0
 endfunction
@@ -58,6 +58,12 @@ function! airline#extensions#update_statusline()
     let args = s:filetype_overrides[&ft]
     call airline#extensions#apply_left_override(args[0], args[1])
   endif
+
+  for item in items(s:filetype_regex_overrides)
+    if match(&ft, item[0]) >= 0
+      call airline#extensions#apply_left_override(item[1][0], item[1][1])
+    endif
+  endfor
 endfunction
 
 function! airline#extensions#is_excluded_window()
@@ -119,8 +125,17 @@ function! airline#extensions#load()
     call airline#extensions#commandt#init(s:ext)
   endif
 
-  if exists(':TagbarToggle')
+  if g:airline_enable_tagbar && exists(':TagbarToggle')
     call airline#extensions#tagbar#init(s:ext)
+  endif
+
+  if g:airline_enable_csv && exists(':Table')
+    call airline#extensions#csv#init(s:ext)
+  endif
+
+  if exists(':VimShell')
+    let s:filetype_overrides['vimshell'] = ['vimshell','%{vimshell#get_status_string()}']
+    let s:filetype_regex_overrides['^int-'] = ['vimshell','%{substitute(&ft, "int-", "", "")}']
   endif
 
   if g:airline_enable_branch && (get(g:, 'loaded_fugitive', 0) || get(g:, 'loaded_lawrencium', 0))
@@ -137,6 +152,10 @@ function! airline#extensions#load()
 
   if g:airline_detect_whitespace
     call airline#extensions#whitespace#init()
+  endif
+
+  if g:airline_detect_iminsert
+    call airline#extensions#iminsert#init()
   endif
 
   call airline#exec_funcrefs(g:airline_statusline_funcrefs, 0)

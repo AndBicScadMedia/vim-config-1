@@ -68,6 +68,7 @@ The following are directories inside the `.vim` directory:
 Plugins Installed
 -----------------
 - **[ctrlp:](http://kien.github.com/ctrlp.vim/)** easy full-path fuzzy file finder
+- **[emmet-vim:](https://github.com/mattn/emmet-vim)** replacing xmledit *and* ultisnips *and* sparkup for quick html writing—finally decided that this is the plugin I want
 - **[SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643)** insert-mode tab-key autocompletion
 - **[Vim-Airline:](https://github.com/bling/vim-airline)** a light-weight statusline replacement
 - **[vim-endwise:(https://github.com/tpope/vim-endwise)** autoinsert "end" for Ruby
@@ -75,4 +76,3 @@ Plugins Installed
 - **[vim-markdown:](https://github.com/tpope/vim-markdown)** adds markdown syntax detection for vim
 - **[vim-startify:](https://github.com/mhinz/vim-startify)** gives me a nice startup page for vim
 - **[Vundle:](https://github.com/gmarik/vundle)** lets me easily manage my plugins and also automatically update them using Git :)
-- **[ZenCoding-vim:](https://github.com/mattn/zencoding-vim)** replacing xmledit *and* ultisnips *and* sparkup for quick html writing—finally decided that this is the plugin I want

@@ -1,7 +1,7 @@
 let s:sfile = expand('<sfile>')
 
 function! s:reload(d)
-  exe "so" a:d."/plugin/zencoding.vim"
+  exe "so" a:d."/plugin/emmet.vim"
   for f in split(globpath(a:d, 'autoload/**/*.vim'), "\n")
     silent! exe "so" f
   endfor
@@ -117,7 +117,7 @@ function! s:test(...)
           call s:show_title(n+1, query)
         else
           call s:show_title(n+1, query)
-          unlet! res | let res = zencoding#ExpandWord(query, testgroup.type, 0)
+          unlet! res | let res = emmet#ExpandWord(query, testgroup.type, 0)
         endif
         if stridx(result, '$$$$') != -1
           if res ==# result
@@ -140,10 +140,10 @@ endfunction
 
 function! s:do_tests(...)
   try
-    if exists('g:user_zen_settings')
-      let s:old_user_zen_settings = g:user_zen_settings
-      let g:user_zen_settings = { 'indentation': "\t" }
+    if exists('g:user_emmet_settings')
+      let s:old_user_emmet_settings = g:user_emmet_settings
     endif
+    let g:user_emmet_settings = { 'indentation': "\t" }
     let oldmore = &more
     call s:reload(fnamemodify(s:sfile, ':h'))
     let &more = 0
@@ -153,13 +153,13 @@ function! s:do_tests(...)
     echohl ErrorMsg | echomsg v:exception | echohl None
   finally
     let &more=oldmore
-    if exists('g:user_zen_settings')
-      let g:user_zen_settings = s:old_user_zen_settings
+    if exists('s:old_user_emmet_settings')
+      let g:user_emmet_settings = s:old_user_emmet_settings
     endif
   endtry
 endfunction
 
-function! g:zencoding_unittest_complete(arglead, cmdline, cmdpos)
+function! g:emmet_unittest_complete(arglead, cmdline, cmdpos)
   let args = split(a:cmdline, '\s\+', 1)
   let testgroups = eval(join(filter(split(substitute(join(readfile(s:sfile), "\n"), '.*\nfinish\n', '', ''), '\n', 1), "v:val !~ '^\"'")))
   try
@@ -173,9 +173,9 @@ function! g:zencoding_unittest_complete(arglead, cmdline, cmdpos)
   return []
 endfunction
 
-command! -nargs=* -complete=customlist,g:zencoding_unittest_complete ZenCodingUnitTest call s:do_tests(<f-args>)
+command! -nargs=* -complete=customlist,g:emmet_unittest_complete EmmetUnitTest call s:do_tests(<f-args>)
 if s:sfile == expand('%:p')
-  ZenCodingUnitTest
+  EmmetUnitTest
 endif
 
 finish
@@ -255,8 +255,8 @@ finish
           'result': "<a href=\"http://www.google.com/\">Google</a>\n",
         },
         {
-          'query': "{ZenCoding}",
-          'result': "ZenCoding",
+          'query': "{Emmet}",
+          'result': "Emmet",
         },
         {
           'query': "a+b",
@@ -556,6 +556,26 @@ finish
         },
       ],
     },
+    {
+      'name': 'contains dash in attributes',
+      'tests': [
+        {
+          'query': "div[foo-bar=\"baz\"]",
+          'result': "<div foo-bar=\"baz\"></div>\n",
+        },
+      ],
+    },
+    {
+      'name': 'multiple group',
+      'tests': [
+        {
+          'query': ".outer$*3>.inner$*2",
+          'result': "<div class=\"outer1\">\n\t<div class=\"inner1\"></div>\n\t<div class=\"inner2\"></div>\n</div>\n<div class=\"outer2\">\n\t<div class=\"inner1\"></div>\n\t<div class=\"inner2\"></div>\n</div>\n<div class=\"outer3\">\n\t<div class=\"inner1\"></div>\n\t<div class=\"inner2\"></div>\n</div>\n",
+        },
+      ],
+    },
+
+     
   ],
 },
 {
@@ -639,6 +659,10 @@ finish
         {
           'query': "m0+bgi+bg++p0$$$$",
           'result': "margin: 0;\nbackground-image: url($$$$);\nbackground: #FFF url() 0 0 no-repeat;\npadding: 0;",
+        },
+        {
+          'query': "borle$$$$",
+          'result': "border-left: $$$$;",
         },
       ],
     },
@@ -818,7 +842,7 @@ finish
         },
         {
           'query': "fs:n",
-          'result': "font-style:normal",
+          'result': "font-style: normal",
         },
         {
           'query': "fl:l|fc",
@@ -826,63 +850,67 @@ finish
         },
         {
           'query': "bg+$$$$",
-          'result': "background:#FFF url($$$$) 0 0 no-repeat",
+          'result': "background: #FFF url($$$$) 0 0 no-repeat",
         },
         {
           'query': "bg+!$$$$",
-          'result': "background:#FFF url($$$$) 0 0 no-repeat !important",
+          'result': "background: #FFF url($$$$) 0 0 no-repeat !important",
         },
         {
           'query': "m$$$$",
-          'result': "margin:$$$$",
+          'result': "margin: $$$$",
         },
         {
           'query': "m0.1p$$$$",
-          'result': "margin:0.1%",
+          'result': "margin: 0.1%",
         },
         {
           'query': "m1.0$$$$",
-          'result': "margin:1.0em",
+          'result': "margin: 1.0em",
         },
         {
           'query': "m2$$$$",
-          'result': "margin:2px",
+          'result': "margin: 2px",
         },
         {
           'query': "bdrs10$$$$",
-          'result': "border-radius:10px",
+          'result': "border-radius: 10px",
         },
         {
           'query': "-bdrs20$$$$",
-          'result': "-webkit-border-radius:20px\n-moz-border-radius:20px\nborder-radius:20px",
+          'result': "-webkit-border-radius: 20px\n-moz-border-radius: 20px\nborder-radius: 20px",
         },
         {
           'query': "lg(top,#fff,#000)$$$$",
-          'result': "background-image:-webkit-gradient(top, 0 0, 0 100, from(#fff), to(#000))\nbackground-image:-webkit-linear-gradient(#fff, #000)\nbackground-image:-moz-linear-gradient(#fff, #000)\nbackground-image:-o-linear-gradient(#fff, #000)\nbackground-image:linear-gradient(#fff, #000)\n",
+          'result': "background-image: -webkit-gradient(top, 0 0, 0 100, from(#fff), to(#000))\nbackground-image: -webkit-linear-gradient(#fff, #000)\nbackground-image: -moz-linear-gradient(#fff, #000)\nbackground-image: -o-linear-gradient(#fff, #000)\nbackground-image: linear-gradient(#fff, #000)\n",
         },
         {
           'query': "m10-5-0$$$$",
-          'result': "margin:10px 5px 0",
+          'result': "margin: 10px 5px 0",
         },
         {
           'query': "m-10--5$$$$",
-          'result': "margin:-10px -5px",
+          'result': "margin: -10px -5px",
         },
         {
           'query': "m10-auto$$$$",
-          'result': "margin:10px auto",
+          'result': "margin: 10px auto",
         },
         {
           'query': "w100p$$$$",
-          'result': "width:100%",
+          'result': "width: 100%",
         },
         {
           'query': "h50e$$$$",
-          'result': "height:50em",
+          'result': "height: 50em",
         },
         {
           'query': "(bg+)+c$$$$",
-          'result': "background:#FFF url($$$$) 0 0 no-repeat\ncolor:#000",
+          'result': "background: #FFF url($$$$) 0 0 no-repeat\ncolor: #000",
+        },
+        {
+          'query': ".first>.second>.third$$$$",
+          'result': "div.first\n\tdiv.second\n\t\tdiv.third\n\t\t\t$$$$",
         },
       ],
     },
