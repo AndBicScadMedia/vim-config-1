@@ -85,7 +85,7 @@ let g:airline_section_y="%Y"
 
 "" zencoding settings
 " remap zen-leader-key
-let g:user_zen_leader_key = '<c-e>'
+let g:user_emmet_leader_key = '<c-e>'
 
 "" ctrlp settings
 " multi-session caching
