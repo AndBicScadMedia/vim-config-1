@@ -180,6 +180,8 @@ au FileType * setlocal formatoptions-=cro
 au BufRead,BufNewFile *.vimrc set filetype=vim
 " auto read outside changes
 set autoread
+" strip ruby trailing whitespace
+autocmd BufWritePre *.rb :%s/\s\+$//e
 " return to last edit position when opening files
 autocmd BufReadPost * 
     \ if line("'\"") > 1 && line("'\"") <= line("$") | 
