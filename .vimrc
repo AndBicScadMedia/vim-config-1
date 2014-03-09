@@ -17,8 +17,7 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 
 " My Bundles:
-Bundle 'kien/ctrlp.vim'
-Bundle 'mattn/emmet-vim'
+Bundle 'othree/html5.vim'
 Bundle 'ervandew/supertab'
 Bundle 'bling/vim-airline'
 Bundle 'tpope/vim-endwise'
@@ -96,8 +95,9 @@ let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
 "" latex settings
 " stop inserting "<++>"s
 let g:Imap_UsePlaceHolders = 0
-" use xelatex to compile
-let g:Tex_CompileRule_pdf = 'xelatex --interaction=nonstopmode $*'
+" use latex to compile
+let g:Tex_CompileRule_pdf = 'pdflatex -interaction=nonstopmode $*'
+" let g:Tex_CompileRule_pdf = 'xelatex --interaction=nonstopmode $*'
 " grep always generates a file-name to fix compatibility bug with vim-latex
 set grepprg=grep\ -nH\ $*
 " tex assumed to be latex
@@ -259,8 +259,6 @@ nnoremap <C-Right> <C-w>l
 " inoremap <down> <nop>
 " inoremap <left> <nop>
 " inoremap <right> <nop>
-" map jk to escape
-map! jk <Esc>
 " remap enter to clear highlighting
 nnoremap <CR> :noh<CR>
 " Don't use Ex mode, use Q for formatting
@@ -282,6 +280,7 @@ if has("autocmd")
   au!
   augroup END
 else
+  set smartindent
   set autoindent		" always set autoindenting on
 endif " has("autocmd")
 
