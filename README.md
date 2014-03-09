@@ -67,11 +67,10 @@ The following are directories inside the `.vim` directory:
 
 Plugins Installed
 -----------------
-- **[ctrlp:](http://kien.github.com/ctrlp.vim/)** easy full-path fuzzy file finder
-- **[emmet-vim:](https://github.com/mattn/emmet-vim)** replacing xmledit *and* ultisnips *and* sparkup for quick html writing—finally decided that this is the plugin I want
+- **[HTML5:](https://github.com/othree/html5.vim)** support for html5 tags in syntax highlighting
 - **[SuperTab:](http://www.vim.org/scripts/script.php?script_id=1643)** insert-mode tab-key autocompletion
 - **[Vim-Airline:](https://github.com/bling/vim-airline)** a light-weight statusline replacement
-- **[vim-endwise:(https://github.com/tpope/vim-endwise)** autoinsert "end" for Ruby
+- **[vim-endwise:](https://github.com/tpope/vim-endwise)** autoinsert "end" for Ruby
 - **[Vim-Latex:](http://vim-latex.sourceforge.net/)** tools for LaTeX editing in vim
 - **[vim-markdown:](https://github.com/tpope/vim-markdown)** adds markdown syntax detection for vim
 - **[vim-startify:](https://github.com/mhinz/vim-startify)** gives me a nice startup page for vim
